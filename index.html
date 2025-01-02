@@ -2,46 +2,124 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Interactive CLI Resume</title>
+  <title>Windows 95 CLI Resume</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    /* Base styling */
-    body {
-      background-color: #333;
-      color: #00ff00;
-      font-family: monospace;
+    /* Basic reset and body style */
+    * {
       margin: 0;
-      padding: 0.5rem;
+      padding: 0;
+      box-sizing: border-box;
     }
-    #terminal {
-      width: 100%;
-      max-width: 800px;
-      margin: 2rem auto;
-      background-color: #222;
-      border-radius: 6px;
+    body {
+      background-color: #008080;
+      font-family: monospace;
       padding: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.8);
-      min-height: 450px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden; /* Hide body scrollbars unless too small a screen */
+    }
+
+    /* Window 95 style container */
+    .window95 {
+      width: 800px;
+      background: #c3c7cb;
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
       display: flex;
       flex-direction: column;
     }
-    #output {
-      flex: 1;
-      overflow-y: auto;
-      margin-bottom: 0.5rem;
-      white-space: pre-wrap;
+    /* Title Bar */
+    .title-bar {
+      display: flex;
+      align-items: center;
+      height: 24px;
+      background: linear-gradient(to right, #000080, #0000A0);
+      color: #fff;
+      padding: 0 4px;
+      user-select: none;
+      font-family: sans-serif;
+      font-size: 14px;
     }
-    .prompt {
+    .title-bar-text {
+      flex: 1;
+      padding-left: 6px;
+    }
+    .title-bar-controls {
+      display: flex;
+      gap: 2px;
+    }
+    .title-bar-button {
+      width: 24px;
+      height: 18px;
+      background: #c3c7cb;
+      border: 1px solid #fff;
+      border-radius: 0;
+      font-size: 14px;
+      line-height: 15px;
+      text-align: center;
+      cursor: pointer;
+      color: #000;
+      user-select: none;
+    }
+    .title-bar-button:active {
+      border: 1px solid #000;
+      background: #fff;
+    }
+
+    /* Menu bar */
+    .menu-bar {
+      display: flex;
+      height: 20px;
+      background-color: #c3c7cb;
+      border-bottom: 2px solid #fff;
+      border-top: 1px solid #fff;
+      padding-left: 6px;
+      font-family: Verdana, sans-serif;
+      font-size: 12px;
+      align-items: center;
+      gap: 10px;
+    }
+    .menu-bar-item {
+      cursor: pointer;
+    }
+    .menu-bar-item:hover {
+      background-color: #000080;
       color: #fff;
     }
+
+    /* Terminal area */
+    #terminal {
+      flex: 1;
+      background-color: #000;
+      color: #00ff00;
+      overflow-y: auto;  /* If content is large, vertical scroll only */
+      overflow-x: hidden;/* No horizontal scroll */
+      padding: 0.5rem;
+      position: relative;
+      font-size: 14px;
+    }
+    #output {
+      white-space: pre-wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .prompt {
+      color: #fff;
+      display: flex;
+      align-items: center;
+    }
     .input-line {
-      width: 100%;
+      flex: 1;
       border: none;
       outline: none;
       background: transparent;
       color: #00ff00;
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 14px;
     }
     .caret {
       display: inline-block;
@@ -56,19 +134,19 @@
       100% { opacity: 1; }
     }
 
-    /* Menu items: mouse + arrow key handling */
+    /* Menu in terminal - arrow selection if desired */
     #menu {
       margin: 1rem 0;
     }
     .menu-item {
       cursor: pointer;
-      padding: 0.5rem;
+      padding: 0.3rem;
       border: 1px solid #00ff00;
       margin: 0.2rem 0;
-      border-radius: 4px;
-      text-align: center;
+      border-radius: 2px;
+      text-align: left;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(5px);
       transition: all 0.3s ease-in-out;
     }
     .menu-item:hover {
@@ -84,113 +162,145 @@
       color: #333;
     }
 
-    /* ASCII art typewriter animation */
-    @keyframes typewriter {
-      from { width: 0; }
-      to { width: 100%; }
-    }
+    /* ASCII Art typewriter animation */
     .ascii-art {
       white-space: pre;
       overflow: hidden;
       border-right: 2px solid #00ff00;
-      width: 0;
-      animation: typewriter 4s steps(45, end) 0.5s 1 normal both;
       margin-bottom: 1rem;
+      display: inline-block;
+      animation: typing 4s steps(45, end) 0.5s 1 normal both, blink-caret 0.75s step-end infinite;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    @keyframes blink-caret {
+      from, to { border-color: transparent; }
+      50% { border-color: #00ff00; }
     }
   </style>
 </head>
 <body>
 
-<div id="terminal">
-  <div id="output">
-    <!-- ASCII Art banner for the CLI launch -->
-    <div class="ascii-art">
-      ____             _     _  _      _ _ _     _   _
-     |  _ \  __ _  __| | __| || |    (_) | |   | |_| |_  ___ _ __
-     | | | |/ _` |/ _` |/ _` || |_   | | | |   | __| __|/ _ \ '__|
-     | |_| | (_| | (_| | (_|__   _|  | | | |   | |_| |_|  __/ |
-     |____/ \__,_|\__,_|\__,  |_|   _/ |_|_|    \__|\__|\___|_|
-                        |___/     |__/
-
-     Welcome to the Interactive CLI Resume of David DeLaurier!
-     Use Arrow Keys or Mouse on the menu below, or type commands.
-     Type 'help' to see available commands.
+<div class="window95" id="win95">
+  <!-- Title Bar -->
+  <div class="title-bar">
+    <div class="title-bar-text">C:\WINDOWS\COMMAND.COM</div>
+    <div class="title-bar-controls">
+      <div class="title-bar-button">_</div>
+      <div class="title-bar-button">□</div>
+      <div class="title-bar-button">X</div>
     </div>
   </div>
 
-  <!-- Prompt area -->
-  <div class="prompt">
-    <span>guest@david-delaurier-resume:~$</span>&nbsp;
-    <input type="text" class="input-line" id="cliInput" autofocus autocomplete="off" />
-    <span class="caret"></span>
+  <!-- Menu Bar -->
+  <div class="menu-bar">
+    <div class="menu-bar-item" onclick="handleCommand('file')">File</div>
+    <div class="menu-bar-item" onclick="handleCommand('edit')">Edit</div>
+    <div class="menu-bar-item" onclick="handleCommand('tools')">Tools</div>
+    <div class="menu-bar-item" onclick="handleCommand('help')">Help</div>
+  </div>
+
+  <!-- Terminal Content -->
+  <div id="terminal">
+    <div id="output">
+      <!-- ASCII ART: DAVID DELAURIER -->
+      <div class="ascii-art">
+  ____             _     _      _    ____       _      
+ |  _ \ __ _ _   _| |__ | | ___| |_ |  _ \  __ _| |_ ___
+ | |_) / _` | | | | '_ \| |/ _ \ __|| | | |/ _` | __/ _ \
+ |  __/ (_| | |_| | |_) | |  __/ |_ | |_| | (_| | ||  __/
+ |_|   \__,_|\__,_|_.__/|_|\___|\__||____/ \__,_|\__\___|
+
+  D E L A U R I E R
+      </div>
+
+      Welcome to the Windows 95 CLI Resume for David DeLaurier!
+      Use "help" command or click a menu item above.
+    </div>
+    <div class="prompt">
+      <span>guest@david-delaurier-resume:~$&nbsp;</span>
+      <input type="text" id="cliInput" class="input-line" autofocus autocomplete="off" />
+      <span class="caret"></span>
+    </div>
   </div>
 </div>
 
+
 <script>
-  // Basic resume data (customize as needed)
+  /******************************************************
+   * Resume Data & Commands
+   ******************************************************/
   const resumeData = {
     summary: `
 Machine Learning Engineer with extensive experience across the entire AI/ML spectrum, from custom data collection
 and model training to large-scale deployment of complex, integrated systems. Consistently pushes boundaries in
 Conversational AI, Generative AI, Large Language Models (LLMs), computer vision, and AI-assisted living environments.
-Proficient in developing bespoke solutions for data processing, model training, and AI-driven automation. 
+Proficient in developing bespoke solutions for data processing, model training, and AI-driven automation.
 `,
     experience: `
-1) text2ceramic (03/2024 – Present) | Technical Founder
-   - Created synthetic 3D object datasets using Blender and generative 3D modeling
-   - Optimized Text-to-3D pipelines with NeRF and diffusion models (Text2NeRF)
+text2ceramic (03/2024 – Present) | Technical Founder, Full-time
+ - Created synthetic 3D datasets using Blender & generative 3D modeling
+ - Streamlined Text-to-3D with NeRF & diffusion models (Text2NeRF), 34% faster
 
-2) Searchlight (09/2023 – 04/2024) | Senior Machine Learning Engineer
-   - ETL for 350,000+ light fixture documents, fine-tuned LayoutLMv3
-   - Built custom search platform with GraphRAG & LLM-based re-ranking
+Searchlight (09/2023 – 04/2024) | Senior Machine Learning Engineer
+ - ETL for ~350,000 fixture docs, fine-tuned LayoutLMv3
+ - Built custom search (GraphRAG + LLM re-ranking)
 
-3) Redactable.com (11/2023 – 02/2024) | Senior ML Engineer
-   - OCR dataset dev: accuracy from 86.7% to 98.1%
-   - Laser ablation robot for precise toner removal
+Redactable.com (11/2023 – 02/2024) | Senior ML Engineer
+ - Led dataset dev: OCR accuracy from 86.7% to 98.1%
+ - Laser ablation robot for toner removal
 
-4) pdf2search (03/2019 – 08/2023) | Founding Machine Learning Engineer
-   - Advanced OCR for ~15M pages in The Bahamas
-   - Customized DB & search w/ Postgres, Neo4j, Elasticsearch
+pdf2search (03/2019 – 08/2023) | Founding ML Engineer
+ - Advanced OCR for ~15M pages, surpassing major cloud solutions
+ - Built specialized DB & search with Postgres, Neo4j, Elasticsearch
 `,
     skills: `
 Autoencoders, GAN, PEFT, RLHF, Object Detection/Tracking, HuggingFace Transformers, spaCy, BERT, NER, OCR,
 Python, SQL, JavaScript, React, C++, Data Augmentation, RAG, GraphRAG, MLX, Azure, AWS, GCP
 `,
     education: `
-Computer Science and Machine Learning — HarvardX (01/2023 – 12/2023)
+Computer Science & Machine Learning — HarvardX (01/2023 – 12/2023)
 Film Production — The Vancouver Film School (01/2009)
 Journalism — University of Georgia (01/2006)
 `,
     contact: `
-Email: DataDeLaurier@gmail.com
+Email:  DataDeLaurier@gmail.com
 LinkedIn: linkedin.com/in/david-delaurier
-Twitter: @DataDeLaurier
+Twitter:  @DataDeLaurier
 Location: Missoula, Montana
 `,
-  };
-
-  // Terminal elements
-  const cliInput = document.getElementById("cliInput");
-  const outputContainer = document.getElementById("output");
-
-  // Commands
-  function handleCommand(command) {
-    const cmd = command.toLowerCase();
-
-    let result = "";
-    switch (cmd) {
-      case "help":
-        result = `
-Available commands:
+    help: `
+Available Commands:
   help        Show this help text
-  summary     Display a quick summary
+  summary     Show quick summary
   experience  List work experience
   skills      Show key skills
-  education   List education credentials
+  education   List education items
   contact     Show contact info
   clear       Clear the screen
-  exit        Exit the resume CLI
-`;
+  exit        Exit the CLI
+`
+  };
+
+  function handleCommand(inputValue) {
+    // Convert to lowercase for command checks
+    const cmd = inputValue.toLowerCase().trim();
+    let result = "";
+    
+    // Echo to screen
+    printToScreen(`guest@david-delaurier-resume:~$ ${inputValue}`, "");
+
+    switch (cmd) {
+      case "file":
+      case "edit":
+      case "tools":
+        // Mimic old Win95 menus
+        result = `The "${cmd}" menu is chosen. (No submenu items implemented.)`;
+        break;
+      case "help":
+        result = resumeData.help;
         break;
       case "summary":
         result = resumeData.summary;
@@ -208,113 +318,113 @@ Available commands:
         result = resumeData.contact;
         break;
       case "clear":
-        outputContainer.innerHTML = "";
-        return; // Skip printing the command echo
+        document.getElementById("output").innerHTML = "";
+        return; // Skip printing response
       case "exit":
-        result = "Exiting... Thanks for visiting!";
+        result = "Exiting... Thank you for visiting!";
         break;
       default:
-        if (cmd.trim().length > 0) {
+        if (cmd.length > 0) {
           result = `Command not found: ${cmd}`;
         }
     }
-    printToScreen(command, result);
+    printToScreen("", result);
   }
 
-  // Output command & response
-  function printToScreen(inputValue, responseText) {
-    const commandLine = document.createElement("div");
-    commandLine.textContent = `guest@david-delaurier-resume:~$ ${inputValue}`;
-    outputContainer.appendChild(commandLine);
+  /******************************************************
+   * Terminal I/O
+   ******************************************************/
+  const cliInput = document.getElementById("cliInput");
+  const outputContainer = document.getElementById("output");
 
-    if (responseText) {
-      const responseElement = document.createElement("div");
-      responseElement.textContent = responseText;
-      outputContainer.appendChild(responseElement);
+  // Print command/response
+  function printToScreen(commandLine, responseText) {
+    if (commandLine) {
+      const cmdDiv = document.createElement("div");
+      cmdDiv.textContent = commandLine;
+      outputContainer.appendChild(cmdDiv);
     }
-
-    // Auto-scroll
+    if (responseText) {
+      const resDiv = document.createElement("div");
+      resDiv.textContent = responseText;
+      outputContainer.appendChild(resDiv);
+    }
+    // Scroll to bottom
     outputContainer.scrollTop = outputContainer.scrollHeight;
   }
 
-  // Keyboard input
-  cliInput.addEventListener("keydown", function(e) {
+  // Input box key handler
+  cliInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
-      const inputValue = cliInput.value.trim();
-      handleCommand(inputValue);
-      if (inputValue.toLowerCase() === "exit") {
-        // Optionally disable input after exit
-        cliInput.disabled = true;
-      }
+      const inputVal = cliInput.value;
+      handleCommand(inputVal);
       cliInput.value = "";
     }
   });
 
-  // Create an interactive menu for mouse and arrow keys
+  /******************************************************
+   * Menu (within terminal) - optional user choices
+   ******************************************************/
   const menuContainer = document.createElement("div");
   menuContainer.id = "menu";
   const menuItems = ["Summary", "Experience", "Skills", "Education", "Contact", "Help", "Clear", "Exit"];
   let currentIndex = 0;
 
   menuItems.forEach((item, index) => {
-    const menuItem = document.createElement("div");
-    menuItem.className = "menu-item";
-    menuItem.textContent = item;
-    menuItem.style.transitionDelay = `${index * 0.1}s`;
-    menuItem.addEventListener("click", () => {
+    const el = document.createElement("div");
+    el.className = "menu-item";
+    el.textContent = item;
+    el.style.transitionDelay = `${0.1 * index}s`;
+    el.addEventListener("click", () => {
       handleCommand(item.toLowerCase());
     });
-    menuContainer.appendChild(menuItem);
+    menuContainer.appendChild(el);
   });
 
   outputContainer.appendChild(menuContainer);
 
-  // Reveal menu items with fade/slide animation
+  // Reveal menu items with fade/slide
   setTimeout(() => {
     document.querySelectorAll(".menu-item").forEach((item) => {
       item.classList.add("visible");
     });
   }, 1000);
 
-  // Arrow key navigation for menu items
+  // Arrow key navigation
   document.addEventListener("keydown", (e) => {
     const items = document.querySelectorAll(".menu-item");
     if (items.length === 0) return;
 
-    // Up / Down arrow to navigate
+    // If user is typing in the CLI input, skip arrow logic
+    if (document.activeElement === cliInput) return;
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
       currentIndex = (currentIndex + 1) % items.length;
-      updateActiveItem(items);
+      updateActive(items);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       currentIndex = (currentIndex - 1 + items.length) % items.length;
-      updateActiveItem(items);
-    } else if (e.key === "Enter" && document.activeElement === document.body) {
-      // If focus is not on the input, select the active menu item
+      updateActive(items);
+    } else if (e.key === "Enter") {
       e.preventDefault();
-      const command = items[currentIndex].textContent.toLowerCase();
+      const command = items[currentIndex].textContent.trim().toLowerCase();
       handleCommand(command);
     }
   });
 
-  // Helper to highlight active menu item
-  function updateActiveItem(items) {
-    items.forEach((item, idx) => {
+  function updateActive(items) {
+    items.forEach((it, idx) => {
       if (idx === currentIndex) {
-        item.classList.add("active");
-        item.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        it.classList.add("active");
+        it.scrollIntoView({ block: "nearest", behavior: "smooth" });
       } else {
-        item.classList.remove("active");
+        it.classList.remove("active");
       }
     });
   }
-
-  // Initialize first menu item as active
-  const firstItem = document.querySelector(".menu-item");
-  if (firstItem) {
-    firstItem.classList.add("active");
-  }
+  // Make first item active
+  document.querySelectorAll(".menu-item")[0].classList.add("active");
 })();
 </script>
 
