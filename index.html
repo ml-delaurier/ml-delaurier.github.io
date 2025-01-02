@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content="Interactive Resume - David DeLaurier" />
+  <meta name="keywords" content="AI, Machine Learning, Interactive Resume, NLP, Data, 3D Ceramics" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Resume - David DeLaurier</title>
+  <!-- Include a Google Font (Optional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Basic RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #fefefe;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #003366;
+      color: #fff;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1rem;
+      margin-top: 0.2rem;
+    }
+
+    /* Navigation */
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #002244;
+      padding: 0.5rem;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    nav a:hover {
+      background: #004488;
+    }
+
+    /* Main Content Sections */
+    section {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+
+    section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #003366;
+    }
+
+    .section-content {
+      margin-bottom: 1rem;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 1.5rem 0;
+    }
+
+    /* Collapsible (Work Experience, etc.) */
+    .collapsible {
+      background-color: #efefef;
+      color: #333;
+      cursor: pointer;
+      padding: 1rem;
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+    }
+
+    .collapsible.active, .collapsible:hover {
+      background-color: #ddd;
+    }
+
+    .content {
+      padding: 0 1rem;
+      display: none;
+      overflow: hidden;
+    }
+
+    .content ul {
+      list-style: disc;
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #003366;
+      color: #fff;
+      margin-top: 2rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      nav a {
+        margin: 0 0.5rem;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1 id="top">David DeLaurier</h1>
+    <p>Staff NLP Machine Learning Engineer based in Missoula, Montana</p>
+    <p>Email: <a href="mailto:DataDeLaurier@gmail.com" style="color:#eee;">DataDeLaurier@gmail.com</a> |
+       LinkedIn: <a href="https://linkedin.com/in/david-delaurier" style="color:#eee;">/in/david-delaurier</a> |
+       Twitter: <a href="https://twitter.com/DataDeLaurier" style="color:#eee;">@DataDeLaurier</a>
+    </p>
+  </header>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#summary">Summary</a>
+    <a href="#work-experience">Work Experience</a>
+    <a href="#skills">Skills</a>
+    <a href="#education">Education</a>
+  </nav>
+
+  <!-- Summary Section -->
+  <section id="summary">
+    <h2>Summary</h2>
+    <div class="section-content">
+      <p>
+        Machine Learning Engineer with extensive experience across the entire AI/ML spectrum, from custom data collection 
+        and model training to large-scale deployment of complex, integrated systems. Consistently pushes boundaries in Conversational AI, 
+        Generative AI, Large Language Models (LLMs), computer vision, and AI-assisted living environments. Proficient in 
+        developing bespoke solutions for data processing, model training, and AI-driven automation across diverse domains. 
+        Committed to advancing the field of AI through continuous learning, experimentation, and the implementation of 
+        cutting-edge technologies.
+      </p>
+    </div>
+  </section>
+
+  <!-- Work Experience Section -->
+  <section id="work-experience">
+    <h2>Work Experience</h2>
+
+    <!-- text2ceramic -->
+    <button class="collapsible">text2ceramic (03/2024 – Present) | Technical Founder, Full-time</button>
+    <div class="content">
+      <p><em>AI-Powered Ceramic Art: From Imagination to Reality</em></p>
+      <ul>
+        <li>
+          Created synthetic 3D object datasets using Blender and generative 3D modeling techniques.
+        </li>
+        <li>
+          Engineered and optimized text-to-3D pipelines using Neural Radiance Fields (NeRF) and diffusion models 
+          (<strong>Text2NeRF</strong>), reducing model generation time by 34% and improving the realism of generated 3D objects.
+        </li>
+      </ul>
+    </div>
+
+    <!-- Searchlight -->
+    <button class="collapsible">Searchlight (09/2023 – 04/2024) | Senior Machine Learning Engineer</button>
+    <div class="content">
+      <p><em>Semantically searchable DB for light fixture manufacturing.</em></p>
+      <ul>
+        <li>
+          Engineered document ETL pipeline to process 350,000+ product spec documents spanning 160 manufacturers.
+        </li>
+        <li>
+          Developed custom data collection tools, synthetic document augmentation, and generation pipelines 
+          to improve model robustness and performance.
+        </li>
+        <li>
+          Fine-tuned LayoutLMv3 models for each manufacturer, achieving significant accuracy gains.
+        </li>
+        <li>
+          Built a custom search platform leveraging GraphRAG and IteRag with intelligent re-ranking using LLM-as-judge.
+        </li>
+      </ul>
+    </div>
+
+    <!-- Redactable.com -->
+    <button class="collapsible">Redactable.com (11/2023 – 02/2024) | Senior Machine Learning Engineer</button>
+    <div class="content">
+      <p><em>AI Document Redaction Service</em></p>
+      <ul>
+        <li>
+          Led development of a specialized text detection dataset, elevating OCR accuracy from 86.7% to 98.1%.
+        </li>
+        <li>
+          Built an AI Agent framework automating NER, PII detection, and context-aware redaction, 
+          achieving superior accuracy across multiple fine-tuned models.
+        </li>
+        <li>
+          Designed a physical document redaction robot using 532 nm green laser ablation, precisely removing toner 
+          without damaging the underlying paper.
+        </li>
+      </ul>
+    </div>
+
+    <!-- pdf2search -->
+    <button class="collapsible">pdf2search (03/2019 – 08/2023) | Founding Machine Learning Engineer</button>
+    <div class="content">
+      <p><em>Extraction and transformation of unstructured data into structured formats.</em></p>
+      <ul>
+        <li>
+          Built advanced OCR system for The Registrars General of The Bahamas, processing ~700,000 documents and 
+          ~15M pages, outperforming popular cloud OCR solutions.
+        </li>
+        <li>
+          Developed custom PostgreSQL and Neo4j databases, integrated with ElasticSearch for semantic search 
+          and intelligent re-ranking.
+        </li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills">
+    <h2>Skills</h2>
+    <div class="section-content">
+      <p><strong>AI/ML & NLP:</strong> Autoencoders, GAN, PEFT, RLHF, Object Detection/Tracking, HuggingFace Transformers, spaCy, NLTK, BERT, Named Entity Recognition (NER), OCR</p>
+      <p><strong>Software & Tools:</strong> Python, Pandas, Numpy, SQL, JavaScript, React, Swift, C++, ETL, Data Augmentation, RESTful APIs, Docker, FastAPI</p>
+      <p><strong>Cloud & Databases:</strong> Azure, AWS, GCP, NoSQL, Vector DBs, GraphQL, BM25, RAG, GraphRAG</p>
+      <p><strong>Other:</strong> Synthetic Data Generation, Structured JSON Extraction, Algorithm Development, MLX, Pydantic</p>
+    </div>
+  </section>
+
+  <!-- Education Section -->
+  <section id="education">
+    <h2>Education</h2>
+    <div class="section-content">
+      <ul>
+        <li><strong>Computer Science and Machine Learning</strong> – HarvardX (Remote) | 01/2023 – 12/2023</li>
+        <li><strong>Film Production</strong> – The Vancouver Film School (Vancouver, BC) | 01/2009</li>
+        <li><strong>Journalism</strong> – University of Georgia (Athens, GA) | 01/2006</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 | Built with HTML, CSS, and JavaScript</p>
+    <p><a href="#top" style="color:#eee;">Back to Top</a></p>
+  </footer>
+
+  <!-- JavaScript for collapsible sections -->
+  <script>
+    const collapsibles = document.querySelectorAll(".collapsible");
+    collapsibles.forEach(button => {
+      button.addEventListener("click", function() {
+        this.classList.toggle("active");
+        const content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
