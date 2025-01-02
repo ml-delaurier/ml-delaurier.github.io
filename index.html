@@ -6,21 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    /* Basic reset and body style */
+    /* Base reset / container setup */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     body {
-      background-color: #008080;
+      background-color: #008080; /* Windows 95 teal */
       font-family: monospace;
       padding: 1rem;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      overflow: hidden; /* Hide body scrollbars unless too small a screen */
+      overflow: hidden; /* Hides outer scrollbars except if needed on small screens */
     }
 
     /* Window 95 style container */
@@ -31,7 +31,9 @@
       box-shadow: 4px 4px 0 #000;
       display: flex;
       flex-direction: column;
+      max-height: 90vh; /* Prevents overflows on small screens */
     }
+
     /* Title Bar */
     .title-bar {
       display: flex;
@@ -57,7 +59,6 @@
       height: 18px;
       background: #c3c7cb;
       border: 1px solid #fff;
-      border-radius: 0;
       font-size: 14px;
       line-height: 15px;
       text-align: center;
@@ -70,7 +71,7 @@
       background: #fff;
     }
 
-    /* Menu bar */
+    /* Menu Bar */
     .menu-bar {
       display: flex;
       height: 20px;
@@ -85,6 +86,7 @@
     }
     .menu-bar-item {
       cursor: pointer;
+      padding: 0 4px;
     }
     .menu-bar-item:hover {
       background-color: #000080;
@@ -96,8 +98,8 @@
       flex: 1;
       background-color: #000;
       color: #00ff00;
-      overflow-y: auto;  /* If content is large, vertical scroll only */
-      overflow-x: hidden;/* No horizontal scroll */
+      overflow-y: auto;    /* Vertical scroll if needed */
+      overflow-x: hidden;  /* No horizontal scroll */
       padding: 0.5rem;
       position: relative;
       font-size: 14px;
@@ -107,6 +109,7 @@
       margin-bottom: 0.5rem;
     }
 
+    /* CLI input prompt */
     .prompt {
       color: #fff;
       display: flex;
@@ -122,11 +125,11 @@
       font-size: 14px;
     }
     .caret {
-      display: inline-block;
       width: 8px;
       background-color: #00ff00;
       animation: blink 1s infinite;
       margin-left: 2px;
+      display: inline-block;
     }
     @keyframes blink {
       0% { opacity: 1; }
@@ -134,7 +137,7 @@
       100% { opacity: 1; }
     }
 
-    /* Menu in terminal - arrow selection if desired */
+    /* Menu inside terminal */
     #menu {
       margin: 1rem 0;
     }
@@ -162,14 +165,14 @@
       color: #333;
     }
 
-    /* ASCII Art typewriter animation */
+    /* ASCII Art typewriter effect */
     .ascii-art {
       white-space: pre;
       overflow: hidden;
-      border-right: 2px solid #00ff00;
-      margin-bottom: 1rem;
       display: inline-block;
-      animation: typing 4s steps(45, end) 0.5s 1 normal both, blink-caret 0.75s step-end infinite;
+      margin-bottom: 1rem;
+      border-right: 2px solid #00ff00;
+      animation: typing 4s steps(60, end) 0.5s 1 normal both, blink-caret 0.75s step-end infinite;
     }
     @keyframes typing {
       from { width: 0; }
@@ -183,7 +186,7 @@
 </head>
 <body>
 
-<div class="window95" id="win95">
+<div class="window95">
   <!-- Title Bar -->
   <div class="title-bar">
     <div class="title-bar-text">C:\WINDOWS\COMMAND.COM</div>
@@ -205,20 +208,24 @@
   <!-- Terminal Content -->
   <div id="terminal">
     <div id="output">
-      <!-- ASCII ART: DAVID DELAURIER -->
+      <!-- ASCII Art from attached file [1][2] -->
       <div class="ascii-art">
-  ____             _     _      _    ____       _      
- |  _ \ __ _ _   _| |__ | | ___| |_ |  _ \  __ _| |_ ___
- | |_) / _` | | | | '_ \| |/ _ \ __|| | | |/ _` | __/ _ \
- |  __/ (_| | |_| | |_) | |  __/ |_ | |_| | (_| | ||  __/
- |_|   \__,_|\__,_|_.__/|_|\___|\__||____/ \__,_|\__\___|
-
-  D E L A U R I E R
+____              _     _                    
+|  _ \  __ ___   _(_) __| |                   
+| | | |/ _` \ \ / / |/ _` |                   
+| |_| | (_| |\ V /| | (_| |                   
+|____/ \__,_| \_/ |_|\__,_|       _           
+|  _ \  ___| |    __ _ _   _ _ __(_) ___ _ __ 
+| | | |/ _ \ |   / _` | | | | '__| |/ _ \ '__|
+| |_| |  __/ |__| (_| | |_| | |  | |  __/ |   
+|____/ \___|_____\__,_|\__,_|_|  |_|\___|_|   
       </div>
 
       Welcome to the Windows 95 CLI Resume for David DeLaurier!
-      Use "help" command or click a menu item above.
+      Use "help" command, or click a menu item above.
     </div>
+
+    <!-- Prompt -->
     <div class="prompt">
       <span>guest@david-delaurier-resume:~$&nbsp;</span>
       <input type="text" id="cliInput" class="input-line" autofocus autocomplete="off" />
@@ -226,7 +233,6 @@
     </div>
   </div>
 </div>
-
 
 <script>
   /******************************************************
@@ -241,20 +247,20 @@ Proficient in developing bespoke solutions for data processing, model training, 
 `,
     experience: `
 text2ceramic (03/2024 – Present) | Technical Founder, Full-time
- - Created synthetic 3D datasets using Blender & generative 3D modeling
- - Streamlined Text-to-3D with NeRF & diffusion models (Text2NeRF), 34% faster
+  - Created synthetic 3D datasets using Blender & generative 3D modeling
+  - Streamlined Text-to-3D with NeRF & diffusion models (Text2NeRF), 34% faster
 
 Searchlight (09/2023 – 04/2024) | Senior Machine Learning Engineer
- - ETL for ~350,000 fixture docs, fine-tuned LayoutLMv3
- - Built custom search (GraphRAG + LLM re-ranking)
+  - ETL for ~350,000 fixture docs, fine-tuned LayoutLMv3
+  - Built custom search (GraphRAG + LLM re-ranking)
 
 Redactable.com (11/2023 – 02/2024) | Senior ML Engineer
- - Led dataset dev: OCR accuracy from 86.7% to 98.1%
- - Laser ablation robot for toner removal
+  - OCR dataset dev: accuracy from 86.7% to 98.1%
+  - Laser ablation robot for toner removal
 
 pdf2search (03/2019 – 08/2023) | Founding ML Engineer
- - Advanced OCR for ~15M pages, surpassing major cloud solutions
- - Built specialized DB & search with Postgres, Neo4j, Elasticsearch
+  - Advanced OCR for ~15M pages, surpassing major cloud solutions
+  - Built specialized DB & search with Postgres, Neo4j, Elasticsearch
 `,
     skills: `
 Autoencoders, GAN, PEFT, RLHF, Object Detection/Tracking, HuggingFace Transformers, spaCy, BERT, NER, OCR,
@@ -266,10 +272,10 @@ Film Production — The Vancouver Film School (01/2009)
 Journalism — University of Georgia (01/2006)
 `,
     contact: `
-Email:  DataDeLaurier@gmail.com
-LinkedIn: linkedin.com/in/david-delaurier
-Twitter:  @DataDeLaurier
-Location: Missoula, Montana
+Email:      DataDeLaurier@gmail.com
+LinkedIn:   linkedin.com/in/david-delaurier
+Twitter:    @DataDeLaurier
+Location:   Missoula, Montana
 `,
     help: `
 Available Commands:
@@ -277,27 +283,27 @@ Available Commands:
   summary     Show quick summary
   experience  List work experience
   skills      Show key skills
-  education   List education items
+  education   List education
   contact     Show contact info
   clear       Clear the screen
   exit        Exit the CLI
 `
   };
 
+  // Command handler
   function handleCommand(inputValue) {
-    // Convert to lowercase for command checks
     const cmd = inputValue.toLowerCase().trim();
     let result = "";
-    
-    // Echo to screen
+
+    // Echo typed command
     printToScreen(`guest@david-delaurier-resume:~$ ${inputValue}`, "");
 
     switch (cmd) {
       case "file":
       case "edit":
       case "tools":
-        // Mimic old Win95 menus
-        result = `The "${cmd}" menu is chosen. (No submenu items implemented.)`;
+        // Mimic old menus
+        result = `You clicked the "${cmd}" menu. (No submenu items implemented.)`;
         break;
       case "help":
         result = resumeData.help;
@@ -319,7 +325,7 @@ Available Commands:
         break;
       case "clear":
         document.getElementById("output").innerHTML = "";
-        return; // Skip printing response
+        return; // Don’t print anything after clearing
       case "exit":
         result = "Exiting... Thank you for visiting!";
         break;
@@ -332,12 +338,12 @@ Available Commands:
   }
 
   /******************************************************
-   * Terminal I/O
+   * Terminal Input & Output
    ******************************************************/
   const cliInput = document.getElementById("cliInput");
   const outputContainer = document.getElementById("output");
 
-  // Print command/response
+  // Print feedback to screen
   function printToScreen(commandLine, responseText) {
     if (commandLine) {
       const cmdDiv = document.createElement("div");
@@ -353,9 +359,10 @@ Available Commands:
     outputContainer.scrollTop = outputContainer.scrollHeight;
   }
 
-  // Input box key handler
+  // Send command when user presses Enter
   cliInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
+      e.preventDefault();  // Prevent any default form submit
       const inputVal = cliInput.value;
       handleCommand(inputVal);
       cliInput.value = "";
@@ -363,18 +370,20 @@ Available Commands:
   });
 
   /******************************************************
-   * Menu (within terminal) - optional user choices
+   * Interactive Menu in Terminal (mouse + arrow keys)
    ******************************************************/
   const menuContainer = document.createElement("div");
   menuContainer.id = "menu";
+  // You can add or remove these items as you wish
   const menuItems = ["Summary", "Experience", "Skills", "Education", "Contact", "Help", "Clear", "Exit"];
   let currentIndex = 0;
 
+  // Create clickable menu items in terminal
   menuItems.forEach((item, index) => {
     const el = document.createElement("div");
     el.className = "menu-item";
     el.textContent = item;
-    el.style.transitionDelay = `${0.1 * index}s`;
+    el.style.transitionDelay = `${0.1 * index}s`; // Staggered fade
     el.addEventListener("click", () => {
       handleCommand(item.toLowerCase());
     });
@@ -383,37 +392,37 @@ Available Commands:
 
   outputContainer.appendChild(menuContainer);
 
-  // Reveal menu items with fade/slide
+  // Reveal items with a fade-in
   setTimeout(() => {
     document.querySelectorAll(".menu-item").forEach((item) => {
       item.classList.add("visible");
     });
   }, 1000);
 
-  // Arrow key navigation
+  // Arrow key navigation for these menu items
   document.addEventListener("keydown", (e) => {
     const items = document.querySelectorAll(".menu-item");
-    if (items.length === 0) return;
+    if (!items.length) return;
 
-    // If user is typing in the CLI input, skip arrow logic
+    // If focus is in CLI input, skip arrow logic
     if (document.activeElement === cliInput) return;
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
       currentIndex = (currentIndex + 1) % items.length;
-      updateActive(items);
+      updateMenuActive(items);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       currentIndex = (currentIndex - 1 + items.length) % items.length;
-      updateActive(items);
+      updateMenuActive(items);
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const command = items[currentIndex].textContent.trim().toLowerCase();
-      handleCommand(command);
+      const cmd = items[currentIndex].textContent.trim().toLowerCase();
+      handleCommand(cmd);
     }
   });
 
-  function updateActive(items) {
+  function updateMenuActive(items) {
     items.forEach((it, idx) => {
       if (idx === currentIndex) {
         it.classList.add("active");
@@ -423,9 +432,8 @@ Available Commands:
       }
     });
   }
-  // Make first item active
+  // Mark the first menu item as active
   document.querySelectorAll(".menu-item")[0].classList.add("active");
-})();
 </script>
 
 </body>
