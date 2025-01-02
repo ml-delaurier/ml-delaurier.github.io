@@ -2,23 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CLI Resume - David DeLaurier</title>
+  <title>Interactive CLI Resume</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Basic reset and styling */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    /* Base styling */
     body {
       background-color: #333;
       color: #00ff00;
       font-family: monospace;
+      margin: 0;
       padding: 0.5rem;
     }
-
     #terminal {
       width: 100%;
       max-width: 800px;
@@ -27,21 +21,19 @@
       border-radius: 6px;
       padding: 1rem;
       box-shadow: 0 0 10px rgba(0,0,0,0.8);
-      min-height: 400px;
+      min-height: 450px;
       display: flex;
       flex-direction: column;
     }
-
     #output {
       flex: 1;
       overflow-y: auto;
       margin-bottom: 0.5rem;
+      white-space: pre-wrap;
     }
-
     .prompt {
       color: #fff;
     }
-
     .input-line {
       width: 100%;
       border: none;
@@ -51,19 +43,6 @@
       font-family: inherit;
       font-size: 1rem;
     }
-
-    .hidden {
-      display: none;
-    }
-
-    /* Command output styling */
-    .command-response {
-      margin: 0.5rem 0;
-      white-space: pre-wrap;
-      line-height: 1.4;
-    }
-
-    /* Make the caret flicker for fun */
     .caret {
       display: inline-block;
       width: 8px;
@@ -71,25 +50,75 @@
       animation: blink 1s infinite;
       margin-left: 2px;
     }
-
     @keyframes blink {
       0% { opacity: 1; }
       50% { opacity: 0; }
       100% { opacity: 1; }
     }
 
-    /* Responsive */
-    @media only screen and (max-width: 600px) {
-      #terminal {
-        margin: 1rem;
-      }
+    /* Menu items: mouse + arrow key handling */
+    #menu {
+      margin: 1rem 0;
+    }
+    .menu-item {
+      cursor: pointer;
+      padding: 0.5rem;
+      border: 1px solid #00ff00;
+      margin: 0.2rem 0;
+      border-radius: 4px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease-in-out;
+    }
+    .menu-item:hover {
+      background-color: #00ff00;
+      color: #333;
+    }
+    .menu-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .menu-item.active {
+      background-color: #00ff00;
+      color: #333;
+    }
+
+    /* ASCII art typewriter animation */
+    @keyframes typewriter {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    .ascii-art {
+      white-space: pre;
+      overflow: hidden;
+      border-right: 2px solid #00ff00;
+      width: 0;
+      animation: typewriter 4s steps(45, end) 0.5s 1 normal both;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
 
 <div id="terminal">
-  <div id="output"></div>
+  <div id="output">
+    <!-- ASCII Art banner for the CLI launch -->
+    <div class="ascii-art">
+      ____             _     _  _      _ _ _     _   _
+     |  _ \  __ _  __| | __| || |    (_) | |   | |_| |_  ___ _ __
+     | | | |/ _` |/ _` |/ _` || |_   | | | |   | __| __|/ _ \ '__|
+     | |_| | (_| | (_| | (_|__   _|  | | | |   | |_| |_|  __/ |
+     |____/ \__,_|\__,_|\__,  |_|   _/ |_|_|    \__|\__|\___|_|
+                        |___/     |__/
+
+     Welcome to the Interactive CLI Resume of David DeLaurier!
+     Use Arrow Keys or Mouse on the menu below, or type commands.
+     Type 'help' to see available commands.
+    </div>
+  </div>
+
+  <!-- Prompt area -->
   <div class="prompt">
     <span>guest@david-delaurier-resume:~$</span>&nbsp;
     <input type="text" class="input-line" id="cliInput" autofocus autocomplete="off" />
@@ -98,167 +127,195 @@
 </div>
 
 <script>
-  // Resume data object
+  // Basic resume data (customize as needed)
   const resumeData = {
-    name: "David DeLaurier",
-    title: "Staff NLP Machine Learning Engineer",
-    location: "Missoula, Montana",
-    email: "DataDeLaurier@gmail.com",
-    linkedin: "linkedin.com/in/david-delaurier",
-    twitter: "@DataDeLaurier",
-    summary: `Machine Learning Engineer with extensive experience across the entire AI/ML spectrum, from custom data collection and
-model training to large-scale deployment of complex, integrated systems. Consistently pushes boundaries in Conversational AI,
-Generative AI, Large Language Models (LLMs), computer vision, and AI-assisted living environments. Proficient in developing bespoke
-solutions for data processing, model training, and AI-driven automation across diverse domains.`,
+    summary: `
+Machine Learning Engineer with extensive experience across the entire AI/ML spectrum, from custom data collection
+and model training to large-scale deployment of complex, integrated systems. Consistently pushes boundaries in
+Conversational AI, Generative AI, Large Language Models (LLMs), computer vision, and AI-assisted living environments.
+Proficient in developing bespoke solutions for data processing, model training, and AI-driven automation. 
+`,
+    experience: `
+1) text2ceramic (03/2024 – Present) | Technical Founder
+   - Created synthetic 3D object datasets using Blender and generative 3D modeling
+   - Optimized Text-to-3D pipelines with NeRF and diffusion models (Text2NeRF)
 
-    experience: [
-      {
-        company: "text2ceramic (03/2024 – Present)",
-        position: "Technical Founder, Full-time",
-        details: [
-          "Created synthetic 3D object datasets using Blender and generative 3D modeling.",
-          "Engineered Text-to-3D pipeline using NeRF and diffusion models (Text2NeRF), reducing generation time by 34%."
-        ]
-      },
-      {
-        company: "Searchlight (09/2023 – 04/2024)",
-        position: "Senior Machine Learning Engineer",
-        details: [
-          "Developed ETL pipeline for 350,000+ specification documents from 160 manufacturers.",
-          "Fine-tuned LayoutLMv3 and built custom search platform with GraphRAG, IteRag, and LLM-based re-ranking."
-        ]
-      },
-      {
-        company: "Redactable.com (11/2023 – 02/2024)",
-        position: "Senior Machine Learning Engineer",
-        details: [
-          "Led OCR dataset development, raising accuracy from 86.7% to 98.1%.",
-          "Implemented multi-model NER, PII detection, and context-aware redaction automation.",
-          "Built a laser ablation robot for physical toner removal with precise green laser targeting."
-        ]
-      },
-      {
-        company: "pdf2search (03/2019 – 08/2023)",
-        position: "Founding Machine Learning Engineer",
-        details: [
-          "Built an advanced OCR system for The Bahamas Registrar's office (~15 million pages).",
-          "Developed custom text detection/recognition outperforming major cloud providers.",
-          "Built specialized PostgreSQL/Neo4j + ElasticSearch pipeline for semantic search."
-        ]
-      }
-    ],
-    skills: [
-      "Autoencoders", "GAN", "PEFT", "RLHF", "Object Detection/Tracking",
-      "HuggingFace Transformers", "spaCy", "BERT", "NER", "OCR",
-      "Python", "SQL", "JavaScript", "React", "C++",
-      "Data Augmentation", "RAG", "GraphRAG", "MLX", "Azure", "AWS", "GCP"
-    ],
-    education: [
-      {
-        degree: "Computer Science and Machine Learning",
-        institution: "HarvardX (Remote)",
-        dates: "01/2023 – 12/2023"
-      },
-      {
-        degree: "Film Production",
-        institution: "The Vancouver Film School",
-        dates: "01/2009"
-      },
-      {
-        degree: "Journalism",
-        institution: "University of Georgia",
-        dates: "01/2006"
-      }
-    ]
+2) Searchlight (09/2023 – 04/2024) | Senior Machine Learning Engineer
+   - ETL for 350,000+ light fixture documents, fine-tuned LayoutLMv3
+   - Built custom search platform with GraphRAG & LLM-based re-ranking
+
+3) Redactable.com (11/2023 – 02/2024) | Senior ML Engineer
+   - OCR dataset dev: accuracy from 86.7% to 98.1%
+   - Laser ablation robot for precise toner removal
+
+4) pdf2search (03/2019 – 08/2023) | Founding Machine Learning Engineer
+   - Advanced OCR for ~15M pages in The Bahamas
+   - Customized DB & search w/ Postgres, Neo4j, Elasticsearch
+`,
+    skills: `
+Autoencoders, GAN, PEFT, RLHF, Object Detection/Tracking, HuggingFace Transformers, spaCy, BERT, NER, OCR,
+Python, SQL, JavaScript, React, C++, Data Augmentation, RAG, GraphRAG, MLX, Azure, AWS, GCP
+`,
+    education: `
+Computer Science and Machine Learning — HarvardX (01/2023 – 12/2023)
+Film Production — The Vancouver Film School (01/2009)
+Journalism — University of Georgia (01/2006)
+`,
+    contact: `
+Email: DataDeLaurier@gmail.com
+LinkedIn: linkedin.com/in/david-delaurier
+Twitter: @DataDeLaurier
+Location: Missoula, Montana
+`,
   };
 
-  // CLI logic
+  // Terminal elements
   const cliInput = document.getElementById("cliInput");
   const outputContainer = document.getElementById("output");
 
   // Commands
-  const commands = {
-    help: () => {
-      return `Available commands:
-  help               Show this help text
-  summary            Display a quick summary
-  experience         List work experience
-  skills             Show key skills
-  education          List education credentials
-  contact            Show contact info
-  clear              Clear the screen
-  `;
-    },
-    summary: () => {
-      return `${resumeData.summary}`;
-    },
-    experience: () => {
-      let expStr = "Work Experience:\n";
-      resumeData.experience.forEach((job) => {
-        expStr += `\n${job.company} | ${job.position}\n`;
-        job.details.forEach((detail) => {
-          expStr += `  - ${detail}\n`;
-        });
-      });
-      return expStr;
-    },
-    skills: () => {
-      return `Skills:\n${resumeData.skills.join(", ")}`;
-    },
-    education: () => {
-      let eduStr = "Education:\n";
-      resumeData.education.forEach((edu) => {
-        eduStr += `\n${edu.degree} — ${edu.institution} (${edu.dates})`;
-      });
-      return eduStr;
-    },
-    contact: () => {
-      return `Contact Information:
-  Name: ${resumeData.name}
-  Title: ${resumeData.title}
-  Location: ${resumeData.location}
-  Email: ${resumeData.email}
-  LinkedIn: ${resumeData.linkedin}
-  Twitter: ${resumeData.twitter}
-  `;
-    },
-    clear: () => {
-      outputContainer.innerHTML = "";
-      return "";
-    }
-  };
+  function handleCommand(command) {
+    const cmd = command.toLowerCase();
 
-  // Handle user input
+    let result = "";
+    switch (cmd) {
+      case "help":
+        result = `
+Available commands:
+  help        Show this help text
+  summary     Display a quick summary
+  experience  List work experience
+  skills      Show key skills
+  education   List education credentials
+  contact     Show contact info
+  clear       Clear the screen
+  exit        Exit the resume CLI
+`;
+        break;
+      case "summary":
+        result = resumeData.summary;
+        break;
+      case "experience":
+        result = resumeData.experience;
+        break;
+      case "skills":
+        result = resumeData.skills;
+        break;
+      case "education":
+        result = resumeData.education;
+        break;
+      case "contact":
+        result = resumeData.contact;
+        break;
+      case "clear":
+        outputContainer.innerHTML = "";
+        return; // Skip printing the command echo
+      case "exit":
+        result = "Exiting... Thanks for visiting!";
+        break;
+      default:
+        if (cmd.trim().length > 0) {
+          result = `Command not found: ${cmd}`;
+        }
+    }
+    printToScreen(command, result);
+  }
+
+  // Output command & response
+  function printToScreen(inputValue, responseText) {
+    const commandLine = document.createElement("div");
+    commandLine.textContent = `guest@david-delaurier-resume:~$ ${inputValue}`;
+    outputContainer.appendChild(commandLine);
+
+    if (responseText) {
+      const responseElement = document.createElement("div");
+      responseElement.textContent = responseText;
+      outputContainer.appendChild(responseElement);
+    }
+
+    // Auto-scroll
+    outputContainer.scrollTop = outputContainer.scrollHeight;
+  }
+
+  // Keyboard input
   cliInput.addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
       const inputValue = cliInput.value.trim();
-      const lineElement = document.createElement("div");
-      lineElement.className = "command-response";
-      lineElement.innerHTML =
-        `<span style="color: #fff;">guest@david-delaurier-resume:~$</span> ${inputValue}`;
-      outputContainer.appendChild(lineElement);
-
-      // Process command
-      if (commands.hasOwnProperty(inputValue)) {
-        const response = commands[inputValue]();
-        if (response) {
-          const responseElement = document.createElement("div");
-          responseElement.className = "command-response";
-          responseElement.textContent = response;
-          outputContainer.appendChild(responseElement);
-        }
-      } else if (inputValue.length > 0) {
-        const notFoundElement = document.createElement("div");
-        notFoundElement.className = "command-response";
-        notFoundElement.textContent = `Command not found: ${inputValue}`;
-        outputContainer.appendChild(notFoundElement);
+      handleCommand(inputValue);
+      if (inputValue.toLowerCase() === "exit") {
+        // Optionally disable input after exit
+        cliInput.disabled = true;
       }
-
       cliInput.value = "";
-      // scroll to bottom
-      outputContainer.scrollTop = outputContainer.scrollHeight;
     }
   });
+
+  // Create an interactive menu for mouse and arrow keys
+  const menuContainer = document.createElement("div");
+  menuContainer.id = "menu";
+  const menuItems = ["Summary", "Experience", "Skills", "Education", "Contact", "Help", "Clear", "Exit"];
+  let currentIndex = 0;
+
+  menuItems.forEach((item, index) => {
+    const menuItem = document.createElement("div");
+    menuItem.className = "menu-item";
+    menuItem.textContent = item;
+    menuItem.style.transitionDelay = `${index * 0.1}s`;
+    menuItem.addEventListener("click", () => {
+      handleCommand(item.toLowerCase());
+    });
+    menuContainer.appendChild(menuItem);
+  });
+
+  outputContainer.appendChild(menuContainer);
+
+  // Reveal menu items with fade/slide animation
+  setTimeout(() => {
+    document.querySelectorAll(".menu-item").forEach((item) => {
+      item.classList.add("visible");
+    });
+  }, 1000);
+
+  // Arrow key navigation for menu items
+  document.addEventListener("keydown", (e) => {
+    const items = document.querySelectorAll(".menu-item");
+    if (items.length === 0) return;
+
+    // Up / Down arrow to navigate
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      currentIndex = (currentIndex + 1) % items.length;
+      updateActiveItem(items);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      currentIndex = (currentIndex - 1 + items.length) % items.length;
+      updateActiveItem(items);
+    } else if (e.key === "Enter" && document.activeElement === document.body) {
+      // If focus is not on the input, select the active menu item
+      e.preventDefault();
+      const command = items[currentIndex].textContent.toLowerCase();
+      handleCommand(command);
+    }
+  });
+
+  // Helper to highlight active menu item
+  function updateActiveItem(items) {
+    items.forEach((item, idx) => {
+      if (idx === currentIndex) {
+        item.classList.add("active");
+        item.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      } else {
+        item.classList.remove("active");
+      }
+    });
+  }
+
+  // Initialize first menu item as active
+  const firstItem = document.querySelector(".menu-item");
+  if (firstItem) {
+    firstItem.classList.add("active");
+  }
+})();
 </script>
 
 </body>
