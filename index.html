@@ -1,38 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Windows 95 CLI Resume</title>
+  <meta charset="UTF-8" />
+  <title>Windows 95 CLI Resume in 3D</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Three.js (r128 as an example) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- CSS3DRenderer from Three.js examples -->
+  <script src="https://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
+
   <style>
-    /* Base reset / container setup */
-    * {
-      margin: 0;
+    /* Make page fill browser window */
+    html, body {
+      margin: 0; 
       padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      background-color: #008080; /* Windows 95 teal */
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #222;
       font-family: monospace;
-      padding: 1rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden; /* Hides outer scrollbars except if needed on small screens */
     }
 
-    /* Window 95 style container */
+    /* The 3D container where we’ll place the 2D HTML window */
+    #sceneContainer {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* This wrapper will become the CSS3DObject in 3D space */
+    .css3d-wrapper {
+      width: 800px;
+      height: auto; /* Let the window’s natural height flow */
+      transform-origin: 50% 50%; /* Center pivot for rotation */
+    }
+
+    /* 
+      Below is the existing "window95" styling and such, 
+      placed inside the .css3d-wrapper. 
+      You can keep your prior styles exactly as-is, 
+      only changing the container/wrapper as shown.
+    */
     .window95 {
       width: 800px;
       background: #c3c7cb;
       border: 2px solid #000;
-      box-shadow: 6px 6px 0px #000; /* Slightly deeper 3D look */
+      box-shadow: 6px 6px 0px #000;
       display: flex;
       flex-direction: column;
-      max-height: 90vh; /* Prevents overflows on small screens */
+      max-height: 90vh;
       transition: transform 0.3s;
+      margin: 0 auto; /* optional center in wrapper */
     }
     .window95:hover {
       transform: translate(-3px, -3px);
@@ -50,14 +70,8 @@
       font-family: sans-serif;
       font-size: 14px;
     }
-    .title-bar-text {
-      flex: 1;
-      padding-left: 6px;
-    }
-    .title-bar-controls {
-      display: flex;
-      gap: 2px;
-    }
+    .title-bar-text { flex: 1; padding-left: 6px; }
+    .title-bar-controls { display: flex; gap: 2px; }
     .title-bar-button {
       width: 24px;
       height: 18px;
@@ -99,8 +113,7 @@
       background-color: #000080;
       color: #fff;
     }
-
-    /* Submenu common styling */
+    /* Submenu styles */
     .submenu {
       position: absolute;
       top: 20px;
@@ -126,16 +139,13 @@
       flex: 1;
       background-color: #000;
       color: #00ff00;
-      overflow-y: auto;    /* Vertical scroll if needed */
-      overflow-x: hidden;  /* No horizontal scroll */
+      overflow-y: auto;
+      overflow-x: hidden;
       padding: 0.5rem;
       position: relative;
       font-size: 14px;
     }
-    #output {
-      white-space: pre-wrap;
-      margin-bottom: 0.5rem;
-    }
+    #output { white-space: pre-wrap; margin-bottom: 0.5rem; }
 
     /* CLI input prompt */
     .prompt {
@@ -160,15 +170,12 @@
       display: inline-block;
     }
     @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0; }
-      100% { opacity: 1; }
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0; }
     }
 
-    /* Menu inside terminal */
-    #menu {
-      margin: 1rem 0;
-    }
+    /* Menu items in terminal */
+    #menu { margin: 1rem 0; }
     .menu-item {
       cursor: pointer;
       padding: 0.3rem;
@@ -200,52 +207,58 @@
       display: inline-block;
       margin-bottom: 1rem;
       border-right: 2px solid #00ff00;
-      animation: typing 4s steps(60, end) 0.5s 1 normal both, blink-caret 0.75s step-end infinite;
+      animation: typing 4s steps(60, end) 0.5s 1 normal both, 
+                 blink-caret 0.75s step-end infinite;
     }
     @keyframes typing {
       from { width: 0; }
-      to { width: 100%; }
+      to   { width: 100%; }
     }
     @keyframes blink-caret {
       from, to { border-color: transparent; }
-      50% { border-color: #00ff00; }
+      50%      { border-color: #00ff00; }
     }
   </style>
 </head>
 <body>
+  <!-- We will place our entire Window95 CLI inside .css3d-wrapper -->
+  <div id="sceneContainer"></div>
 
-<div class="window95">
-  <!-- Title Bar -->
-  <div class="title-bar">
-    <div class="title-bar-text">C:\WINDOWS\COMMAND.COM</div>
-    <div class="title-bar-controls">
-      <div class="title-bar-button">_</div>
-      <div class="title-bar-button">□</div>
-      <div class="title-bar-button">X</div>
-    </div>
-  </div>
+  <div id="templateWindow" style="display:none;">
+    <div class="css3d-wrapper">
+      <!-- The existing "window95" HTML goes here -->
+      <div class="window95">
+        <!-- Title Bar -->
+        <div class="title-bar">
+          <div class="title-bar-text">C:\WINDOWS\COMMAND.COM</div>
+          <div class="title-bar-controls">
+            <div class="title-bar-button">_</div>
+            <div class="title-bar-button">□</div>
+            <div class="title-bar-button">X</div>
+          </div>
+        </div>
 
-  <!-- Menu Bar -->
-  <div class="menu-bar">
-    <div class="menu-bar-item" id="fileMenuBtn">File
-      <!-- File Submenu -->
-      <div class="submenu" id="fileSubmenu">
-        <div class="submenu-item" onclick="handleCommand('new-file')">New</div>
-        <div class="submenu-item" onclick="handleCommand('open-file')">Open</div>
-        <div class="submenu-item" onclick="handleCommand('save-file')">Save</div>
-        <div class="submenu-item" onclick="handleCommand('exit')">Exit</div>
-      </div>
-    </div>
-    <div class="menu-bar-item" onclick="handleCommand('edit')">Edit</div>
-    <div class="menu-bar-item" onclick="handleCommand('tools')">Tools</div>
-    <div class="menu-bar-item" onclick="handleCommand('help')">Help</div>
-  </div>
+        <!-- Menu Bar -->
+        <div class="menu-bar">
+          <div class="menu-bar-item" id="fileMenuBtn">File
+            <!-- File Submenu -->
+            <div class="submenu" id="fileSubmenu">
+              <div class="submenu-item" onclick="handleCommand('new-file')">New</div>
+              <div class="submenu-item" onclick="handleCommand('open-file')">Open</div>
+              <div class="submenu-item" onclick="handleCommand('save-file')">Save</div>
+              <div class="submenu-item" onclick="handleCommand('exit')">Exit</div>
+            </div>
+          </div>
+          <div class="menu-bar-item" onclick="handleCommand('edit')">Edit</div>
+          <div class="menu-bar-item" onclick="handleCommand('tools')">Tools</div>
+          <div class="menu-bar-item" onclick="handleCommand('help')">Help</div>
+        </div>
 
-  <!-- Terminal Content -->
-  <div id="terminal">
-    <div id="output">
-      <!-- ASCII Art -->
-      <div class="ascii-art">
+        <!-- Terminal Content -->
+        <div id="terminal">
+          <div id="output">
+            <!-- ASCII Art -->
+            <div class="ascii-art">
 ____              _     _                    
 |  _ \  __ ___   _(_) __| |                   
 | | | |/ _` \ \ / / |/ _` |                   
@@ -255,33 +268,35 @@ ____              _     _
 | | | |/ _ \ |   / _` | | | | '__| |/ _ \ '__|
 | |_| |  __/ |__| (_| | |_| | |  | |  __/ |   
 |____/ \___|_____\__,_|\__,_|_|  |_|\___|_|   
+            </div>
+
+            Welcome!
+            Use "help" command, or click a menu item above.
+          </div>
+
+          <!-- Prompt -->
+          <div class="prompt">
+            <span>guest@david-delaurier-resume:~$&nbsp;</span>
+            <input type="text" id="cliInput" class="input-line" autofocus autocomplete="off" />
+            <span class="caret"></span>
+          </div>
+        </div>
       </div>
-
-      Welcome!
-      Use "help" command, or click a menu item above.
-    </div>
-
-    <!-- Prompt -->
-    <div class="prompt">
-      <span>guest@david-delaurier-resume:~$&nbsp;</span>
-      <input type="text" id="cliInput" class="input-line" autofocus autocomplete="off" />
-      <span class="caret"></span>
     </div>
   </div>
-</div>
 
-<script>
-  /******************************************************
-   * Resume Data & Commands
-   ******************************************************/
-  const resumeData = {
-    summary: `
+  <script>
+    /******************************************************
+     * Resume Data & Commands
+     ******************************************************/
+    const resumeData = {
+      summary: `
 Machine Learning Engineer with extensive experience across the entire AI/ML spectrum, from custom data collection
 and model training to large-scale deployment of complex, integrated systems. Consistently pushes boundaries in
 Conversational AI, Generative AI, Large Language Models (LLMs), computer vision, and AI-assisted living environments.
 Proficient in developing bespoke solutions for data processing, model training, and AI-driven automation.
 `,
-    experience: `
+      experience: `
 text2ceramic (03/2024 – Present) | Technical Founder, Full-time
   - Created synthetic 3D datasets using Blender & generative 3D modeling
   - Streamlined Text-to-3D with NeRF & diffusion models (Text2NeRF), 34% faster
@@ -298,21 +313,21 @@ pdf2search (03/2019 – 08/2023) | Founding ML Engineer
   - Advanced OCR for ~15M pages, surpassing major cloud solutions
   - Built specialized DB & search with Postgres, Neo4j, Elasticsearch
 `,
-    skills: `
+      skills: `
 Autoencoders, GAN, PEFT, RLHF, Object Detection/Tracking, HuggingFace Transformers, spaCy, BERT, NER, OCR,
 Python, SQL, JavaScript, React, C++, Data Augmentation, RAG, GraphRAG, MLX, Azure, AWS, GCP
 `,
-    education: `
+      education: `
 Computer Science & Machine Learning — HarvardX (01/2023 – 12/2023)
 Film Production — The Vancouver Film School (01/2009)
 Journalism — University of Georgia (01/2006)
 `,
-    contact: `
+      contact: `
 Email:      ml.delaurier@gmail.com
 LinkedIn:   linkedin.com/in/david-delaurier
 Location:   Missoula, Montana
 `,
-    help: `
+      help: `
 Available Commands:
   help        Show this help text
   summary     Show quick summary
@@ -323,191 +338,236 @@ Available Commands:
   clear       Clear the screen
   exit        Exit the CLI
 `
-  };
+    };
 
-  /******************************************************
-   * Command Handler
-   ******************************************************/
-  function handleCommand(inputValue) {
-    const cmd = inputValue.toLowerCase().trim();
-    let result = "";
+    function handleCommand(inputValue) {
+      const cmd = inputValue.toLowerCase().trim();
+      let result = "";
 
-    // Echo typed command
-    printToScreen(\`guest@david-delaurier-resume:~$ \${inputValue}\`, "");
+      // Echo typed command
+      printToScreen(`guest@david-delaurier-resume:~$ ${inputValue}`, "");
 
-    switch (cmd) {
-      case "file":
-        // Now toggled by submenu
-        result = "You clicked the 'File' menu. (Use the submenu items!)";
-        break;
-      case "edit":
-      case "tools":
-        result = \`You clicked the "\${cmd}" menu. (No submenu items implemented.)\`;
-        break;
-      case "help":
-        result = resumeData.help;
-        break;
-      case "summary":
-        result = resumeData.summary;
-        break;
-      case "experience":
-        result = resumeData.experience;
-        break;
-      case "skills":
-        result = resumeData.skills;
-        break;
-      case "education":
-        result = resumeData.education;
-        break;
-      case "contact":
-        result = resumeData.contact;
-        break;
-      case "clear":
-        document.getElementById("output").innerHTML = "";
-        return; // Don’t print anything after clearing
-      case "exit":
-        result = "Exiting... Thank you for visiting!";
-        break;
-      case "new-file":
-        result = "You selected 'New'. (Not yet implemented)";
-        break;
-      case "open-file":
-        result = "You selected 'Open'. (Not yet implemented)";
-        break;
-      case "save-file":
-        result = "You selected 'Save'. (Not yet implemented)";
-        break;
-      default:
-        if (cmd.length > 0) {
-          result = \`Command not found: \${cmd}\`;
+      switch (cmd) {
+        case "file":
+          // Toggled by submenu now, but let's echo something
+          result = "You clicked 'File' menu. (Use the submenu items!)";
+          break;
+        case "edit":
+        case "tools":
+          result = `You clicked the "${cmd}" menu. (No submenu items implemented.)`;
+          break;
+        case "help":
+          result = resumeData.help;
+          break;
+        case "summary":
+          result = resumeData.summary;
+          break;
+        case "experience":
+          result = resumeData.experience;
+          break;
+        case "skills":
+          result = resumeData.skills;
+          break;
+        case "education":
+          result = resumeData.education;
+          break;
+        case "contact":
+          result = resumeData.contact;
+          break;
+        case "clear":
+          document.getElementById("output").innerHTML = "";
+          return; 
+        case "exit":
+          result = "Exiting... Thank you for visiting!";
+          break;
+        case "new-file":
+          result = "You selected 'New'. (Not implemented)";
+          break;
+        case "open-file":
+          result = "You selected 'Open'. (Not implemented)";
+          break;
+        case "save-file":
+          result = "You selected 'Save'. (Not implemented)";
+          break;
+        default:
+          if (cmd.length > 0) {
+            result = `Command not found: ${cmd}`;
+          }
+      }
+      printToScreen("", result);
+    }
+
+    // Print to terminal
+    function printToScreen(commandLine, responseText) {
+      const outputContainer = document.getElementById("output");
+      if (commandLine) {
+        const cmdDiv = document.createElement("div");
+        cmdDiv.textContent = commandLine;
+        outputContainer.appendChild(cmdDiv);
+      }
+      if (responseText) {
+        const resDiv = document.createElement("div");
+        resDiv.textContent = responseText;
+        outputContainer.appendChild(resDiv);
+      }
+      // Scroll to bottom
+      outputContainer.scrollTop = outputContainer.scrollHeight;
+    }
+
+    // Handle the CLI input
+    const observer = new MutationObserver(() => {
+      // Just in case the window is added dynamically
+      const cliInput = document.getElementById("cliInput");
+      if (!cliInput) return;
+
+      cliInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleCommand(cliInput.value);
+          cliInput.value = "";
+          hideFileSubmenu();
         }
-    }
-    printToScreen("", result);
-  }
-
-  /******************************************************
-   * Terminal Input & Output
-   ******************************************************/
-  const cliInput = document.getElementById("cliInput");
-  const outputContainer = document.getElementById("output");
-
-  // Print feedback to screen
-  function printToScreen(commandLine, responseText) {
-    if (commandLine) {
-      const cmdDiv = document.createElement("div");
-      cmdDiv.textContent = commandLine;
-      outputContainer.appendChild(cmdDiv);
-    }
-    if (responseText) {
-      const resDiv = document.createElement("div");
-      resDiv.textContent = responseText;
-      outputContainer.appendChild(resDiv);
-    }
-    // Scroll to bottom
-    outputContainer.scrollTop = outputContainer.scrollHeight;
-  }
-
-  // Send command when user presses Enter
-  cliInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();  // Prevent any default form submit
-      const inputVal = cliInput.value;
-      handleCommand(inputVal);
-      cliInput.value = "";
-      hideFileSubmenu(); 
-    }
-  });
-
-  /******************************************************
-   * File Submenu Toggle
-   ******************************************************/
-  const fileMenuBtn = document.getElementById("fileMenuBtn");
-  const fileSubmenu = document.getElementById("fileSubmenu");
-  let fileMenuVisible = false;
-
-  fileMenuBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    fileMenuVisible = !fileMenuVisible;
-    fileSubmenu.style.display = fileMenuVisible ? "block" : "none";
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!fileMenuBtn.contains(e.target)) {
-      hideFileSubmenu();
-    }
-  });
-
-  function hideFileSubmenu() {
-    fileMenuVisible = false;
-    fileSubmenu.style.display = "none";
-  }
-
-  /******************************************************
-   * Interactive Menu in Terminal (mouse + arrow keys)
-   ******************************************************/
-  const menuContainer = document.createElement("div");
-  menuContainer.id = "menu";
-
-  const menuItems = ["Summary", "Experience", "Skills", "Education", "Contact", "Help", "Clear", "Exit"];
-  let currentIndex = 0;
-
-  // Create clickable menu items in terminal
-  menuItems.forEach((item, index) => {
-    const el = document.createElement("div");
-    el.className = "menu-item";
-    el.textContent = item;
-    el.style.transitionDelay = \`\${0.1 * index}s\`; // Staggered fade
-    el.addEventListener("click", () => {
-      handleCommand(item.toLowerCase());
+      });
     });
-    menuContainer.appendChild(el);
-  });
+    observer.observe(document.body, { childList: true, subtree: true });
 
-  outputContainer.appendChild(menuContainer);
-
-  // Reveal items with a fade-in
-  setTimeout(() => {
-    document.querySelectorAll(".menu-item").forEach((item) => {
-      item.classList.add("visible");
-    });
-  }, 1000);
-
-  // Arrow key navigation for these menu items
-  document.addEventListener("keydown", (e) => {
-    const items = document.querySelectorAll(".menu-item");
-    if (!items.length) return;
-
-    // If focus is in CLI input, skip arrow logic
-    if (document.activeElement === cliInput) return;
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      currentIndex = (currentIndex + 1) % items.length;
-      updateMenuActive(items);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      currentIndex = (currentIndex - 1 + items.length) % items.length;
-      updateMenuActive(items);
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      const cmd = items[currentIndex].textContent.trim().toLowerCase();
-      handleCommand(cmd);
+    // File Submenu toggle
+    let fileMenuVisible = false;
+    function hideFileSubmenu() {
+      fileMenuVisible = false;
+      const submenu = document.getElementById("fileSubmenu");
+      if (submenu) submenu.style.display = "none";
     }
-  });
-
-  function updateMenuActive(items) {
-    items.forEach((it, idx) => {
-      if (idx === currentIndex) {
-        it.classList.add("active");
-        it.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    document.addEventListener("click", (e) => {
+      const menuBtn = document.getElementById("fileMenuBtn");
+      const fileSubmenu = document.getElementById("fileSubmenu");
+      if (!menuBtn || !fileSubmenu) return;
+      if (menuBtn.contains(e.target)) {
+        e.stopPropagation();
+        fileMenuVisible = !fileMenuVisible;
+        fileSubmenu.style.display = fileMenuVisible ? "block" : "none";
       } else {
-        it.classList.remove("active");
+        hideFileSubmenu();
       }
     });
-  }
-  // Mark the first menu item as active
-  document.querySelectorAll(".menu-item")[0].classList.add("active");
-</script>
 
+    // Interactive Menu in Terminal (mouse + arrow keys)
+    function initTerminalMenu() {
+      const menuContainer = document.createElement("div");
+      menuContainer.id = "menu";
+
+      const menuItems = ["Summary", "Experience", "Skills", "Education", "Contact", "Help", "Clear", "Exit"];
+      let currentIndex = 0;
+
+      menuItems.forEach((item, index) => {
+        const el = document.createElement("div");
+        el.className = "menu-item";
+        el.textContent = item;
+        el.style.transitionDelay = `${0.1 * index}s`;
+        el.addEventListener("click", () => {
+          handleCommand(item.toLowerCase());
+        });
+        menuContainer.appendChild(el);
+      });
+
+      const outputEl = document.getElementById("output");
+      outputEl.appendChild(menuContainer);
+
+      // Reveal items with a fade-in
+      setTimeout(() => {
+        document.querySelectorAll(".menu-item").forEach((item) => {
+          item.classList.add("visible");
+        });
+      }, 1000);
+
+      document.addEventListener("keydown", (e) => {
+        const items = document.querySelectorAll(".menu-item");
+        if (!items.length) return;
+
+        // If focus is in CLI input, skip arrow logic
+        const cliInput = document.getElementById("cliInput");
+        if (document.activeElement === cliInput) return;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          currentIndex = (currentIndex + 1) % items.length;
+          updateMenuActive(items);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          currentIndex = (currentIndex - 1 + items.length) % items.length;
+          updateMenuActive(items);
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          const cmd = items[currentIndex].textContent.trim().toLowerCase();
+          handleCommand(cmd);
+        }
+      });
+
+      function updateMenuActive(items) {
+        items.forEach((it, idx) => {
+          if (idx === currentIndex) {
+            it.classList.add("active");
+            it.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          } else {
+            it.classList.remove("active");
+          }
+        });
+      }
+      // Mark the first menu item as active
+      document.querySelectorAll(".menu-item")[0].classList.add("active");
+    }
+
+    // 3D Scene with CSS3DRenderer 
+    let camera, scene, renderer, controls, css3DObject;
+
+    function init3D() {
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 50);
+
+      // Create the CSS3DRenderer
+      renderer = new THREE.CSS3DRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById('sceneContainer').appendChild(renderer.domElement);
+
+      // Take the hidden #templateWindow and clone it so we can insert into the scene
+      const template = document.querySelector("#templateWindow .css3d-wrapper");
+      const clone = template.cloneNode(true);
+      clone.style.display = "block";
+
+      // Make a CSS3DObject from that clone
+      css3DObject = new THREE.CSS3DObject(clone);
+      css3DObject.position.set(0, 0, 0);
+      css3DObject.rotation.x = THREE.MathUtils.degToRad(10); // slight tilt
+      scene.add(css3DObject);
+
+      // Resize handle
+      window.addEventListener('resize', onWindowResize, false);
+
+      // Initialize the terminal menu items
+      setTimeout(initTerminalMenu, 300); // small delay so it loads
+
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Optionally rotate it slowly
+      css3DObject.rotation.y += 0.002;
+
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // Start it all
+    init3D();
+  </script>
 </body>
 </html>
