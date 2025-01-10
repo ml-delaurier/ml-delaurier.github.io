@@ -28,10 +28,14 @@
       width: 800px;
       background: #c3c7cb;
       border: 2px solid #000;
-      box-shadow: 4px 4px 0 #000;
+      box-shadow: 6px 6px 0px #000; /* Slightly deeper 3D look */
       display: flex;
       flex-direction: column;
       max-height: 90vh; /* Prevents overflows on small screens */
+      transition: transform 0.3s;
+    }
+    .window95:hover {
+      transform: translate(-3px, -3px);
     }
 
     /* Title Bar */
@@ -83,12 +87,36 @@
       font-size: 12px;
       align-items: center;
       gap: 10px;
+      position: relative;
     }
     .menu-bar-item {
       cursor: pointer;
       padding: 0 4px;
+      user-select: none;
+      position: relative;
     }
     .menu-bar-item:hover {
+      background-color: #000080;
+      color: #fff;
+    }
+
+    /* Submenu common styling */
+    .submenu {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      background-color: #c3c7cb;
+      border: 2px solid #000;
+      display: none;
+      min-width: 120px;
+      z-index: 10;
+    }
+    .submenu-item {
+      padding: 2px 8px;
+      transition: background 0.2s;
+      user-select: none;
+    }
+    .submenu-item:hover {
       background-color: #000080;
       color: #fff;
     }
@@ -199,7 +227,15 @@
 
   <!-- Menu Bar -->
   <div class="menu-bar">
-    <div class="menu-bar-item" onclick="handleCommand('file')">File</div>
+    <div class="menu-bar-item" id="fileMenuBtn">File
+      <!-- File Submenu -->
+      <div class="submenu" id="fileSubmenu">
+        <div class="submenu-item" onclick="handleCommand('new-file')">New</div>
+        <div class="submenu-item" onclick="handleCommand('open-file')">Open</div>
+        <div class="submenu-item" onclick="handleCommand('save-file')">Save</div>
+        <div class="submenu-item" onclick="handleCommand('exit')">Exit</div>
+      </div>
+    </div>
     <div class="menu-bar-item" onclick="handleCommand('edit')">Edit</div>
     <div class="menu-bar-item" onclick="handleCommand('tools')">Tools</div>
     <div class="menu-bar-item" onclick="handleCommand('help')">Help</div>
@@ -208,7 +244,7 @@
   <!-- Terminal Content -->
   <div id="terminal">
     <div id="output">
-      <!-- ASCII Art from attached file [1][2] -->
+      <!-- ASCII Art -->
       <div class="ascii-art">
 ____              _     _                    
 |  _ \  __ ___   _(_) __| |                   
@@ -221,7 +257,7 @@ ____              _     _
 |____/ \___|_____\__,_|\__,_|_|  |_|\___|_|   
       </div>
 
-      Welcome to the Windows 95 CLI Resume for David DeLaurier!
+      Welcome!
       Use "help" command, or click a menu item above.
     </div>
 
@@ -272,9 +308,8 @@ Film Production — The Vancouver Film School (01/2009)
 Journalism — University of Georgia (01/2006)
 `,
     contact: `
-Email:      DataDeLaurier@gmail.com
+Email:      ml.delaurier@gmail.com
 LinkedIn:   linkedin.com/in/david-delaurier
-Twitter:    @DataDeLaurier
 Location:   Missoula, Montana
 `,
     help: `
@@ -290,20 +325,24 @@ Available Commands:
 `
   };
 
-  // Command handler
+  /******************************************************
+   * Command Handler
+   ******************************************************/
   function handleCommand(inputValue) {
     const cmd = inputValue.toLowerCase().trim();
     let result = "";
 
     // Echo typed command
-    printToScreen(`guest@david-delaurier-resume:~$ ${inputValue}`, "");
+    printToScreen(\`guest@david-delaurier-resume:~$ \${inputValue}\`, "");
 
     switch (cmd) {
       case "file":
+        // Now toggled by submenu
+        result = "You clicked the 'File' menu. (Use the submenu items!)";
+        break;
       case "edit":
       case "tools":
-        // Mimic old menus
-        result = `You clicked the "${cmd}" menu. (No submenu items implemented.)`;
+        result = \`You clicked the "\${cmd}" menu. (No submenu items implemented.)\`;
         break;
       case "help":
         result = resumeData.help;
@@ -329,9 +368,18 @@ Available Commands:
       case "exit":
         result = "Exiting... Thank you for visiting!";
         break;
+      case "new-file":
+        result = "You selected 'New'. (Not yet implemented)";
+        break;
+      case "open-file":
+        result = "You selected 'Open'. (Not yet implemented)";
+        break;
+      case "save-file":
+        result = "You selected 'Save'. (Not yet implemented)";
+        break;
       default:
         if (cmd.length > 0) {
-          result = `Command not found: ${cmd}`;
+          result = \`Command not found: \${cmd}\`;
         }
     }
     printToScreen("", result);
@@ -366,15 +414,40 @@ Available Commands:
       const inputVal = cliInput.value;
       handleCommand(inputVal);
       cliInput.value = "";
+      hideFileSubmenu(); 
     }
   });
+
+  /******************************************************
+   * File Submenu Toggle
+   ******************************************************/
+  const fileMenuBtn = document.getElementById("fileMenuBtn");
+  const fileSubmenu = document.getElementById("fileSubmenu");
+  let fileMenuVisible = false;
+
+  fileMenuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    fileMenuVisible = !fileMenuVisible;
+    fileSubmenu.style.display = fileMenuVisible ? "block" : "none";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!fileMenuBtn.contains(e.target)) {
+      hideFileSubmenu();
+    }
+  });
+
+  function hideFileSubmenu() {
+    fileMenuVisible = false;
+    fileSubmenu.style.display = "none";
+  }
 
   /******************************************************
    * Interactive Menu in Terminal (mouse + arrow keys)
    ******************************************************/
   const menuContainer = document.createElement("div");
   menuContainer.id = "menu";
-  // You can add or remove these items as you wish
+
   const menuItems = ["Summary", "Experience", "Skills", "Education", "Contact", "Help", "Clear", "Exit"];
   let currentIndex = 0;
 
@@ -383,7 +456,7 @@ Available Commands:
     const el = document.createElement("div");
     el.className = "menu-item";
     el.textContent = item;
-    el.style.transitionDelay = `${0.1 * index}s`; // Staggered fade
+    el.style.transitionDelay = \`\${0.1 * index}s\`; // Staggered fade
     el.addEventListener("click", () => {
       handleCommand(item.toLowerCase());
     });
